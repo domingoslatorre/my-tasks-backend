@@ -1,14 +1,23 @@
 package com.example.mytasksbackend.user;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
+@Entity
+@Table(name = "users")
 public class User {
+    @Id
     private UUID id;
     private String name;
     private String email;
     private String password;
     private Instant createdAt;
+
+    public User() {
+    }
 
     public User(String name, String email, String password) {
         this.id = UUID.randomUUID();
