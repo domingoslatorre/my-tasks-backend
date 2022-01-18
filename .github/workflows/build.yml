@@ -10,9 +10,32 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 123456
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        
+      - name: Install postgresql-client
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
+          
+      - name: Setup database
+        run: psql -h localhost -p 5432 -U postgres -c 'CREATE DATABASE "my_tasks";'
+        env:
+          PGPASSWORD: 123456
 
       - name: Setup Java JDK 11
         uses: actions/setup-java@v2.5.0
@@ -28,3 +51,8 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
+        env: 
+          DATASOURCE_URL: jdbc:postgresql://localhost:5432/my_tasks
+          DATASOURCE_USERNAME: postgres
+          DATASOURCE_PASSWORD: 123456
+          
